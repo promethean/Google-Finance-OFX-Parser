@@ -1,3 +1,8 @@
 = README =
+
+This is an attempt to build a parser for Google Finance exports in PHP.
+Google Finance exports in basic SGML which doesn't close XML tags.  It is not valid XML, although it appears to be based on valid OFX tags.
+Google Finance doesn't export dividend data.
+
 == Example Usage ==
 See example.php for usage.
