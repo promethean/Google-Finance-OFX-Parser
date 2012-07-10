@@ -10,20 +10,30 @@ class Google_Finance_OFX_Parser
 
     private $ofx;
 
+    /**
+     * Constructor
+     * @param string $ofx OFX file from Google finance
+     */
     public function __construct($ofx)
     {
         $this->ofx = $ofx;
-        // var_dump($ofx);
     }
 
-    public function format_date($input)
+    /**
+     * Date Helper for the class
+     * @param  string $input date string in the format 20120908
+     * @return string        date in the format "Y-m-d"
+     */
+    private function format_date($input)
     {
-        var_dump($input);
         $date = DateTime::createFromFormat ( "Ymd" , $input);
         return (string) $date->format('Y-m-d');
     }
 
-
+    /**
+     * Parses the OFX  and returns JSON object
+     * @return string JSON object
+     */
     public function parse() {
 
         $portfolio = new StdClass;
@@ -32,7 +42,6 @@ class Google_Finance_OFX_Parser
         $portfolio->stocks = array();
 
         // Parse Portfolio
-
         $lines = explode("\n", $this->ofx);
         $txn = null;
         foreach ($lines as $line) {
@@ -43,7 +52,7 @@ class Google_Finance_OFX_Parser
                 $portfolio->name = substr($line, 8);
             }
 
-            // New transaction.
+            // New Stock transaction.
             if ($line == "<BUYSTOCK>" OR $line == "<SELLSTOCK>") {
 
                 $txn = new stdClass();
@@ -87,7 +96,7 @@ class Google_Finance_OFX_Parser
                 $txn->type = 'BUY';
             }
 
-            // End of transaction.
+            // End of Stock transaction.
             if ($line == "</BUYSTOCK>" OR $line == "</SELLSTOCK>") {
                 $portfolio->txns[]= $txn;
             }
@@ -103,7 +112,7 @@ class Google_Finance_OFX_Parser
                 $portfolio->cash_txns[]= $cash;
             }
 
-            // Open new Cash transaction.
+            // Open new Stock
             if ($line == "<STOCKINFO>") {
                 $stock = new StdClass;
                 $stock->ticker = null;
@@ -118,7 +127,6 @@ class Google_Finance_OFX_Parser
 
         }
 
-        // Return.
         return json_encode($portfolio);
     }
 
