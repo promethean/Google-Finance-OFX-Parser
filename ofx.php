@@ -16,6 +16,14 @@ class Google_Finance_OFX_Parser
         // var_dump($ofx);
     }
 
+    public function format_date($input)
+    {
+        var_dump($input);
+        $date = DateTime::createFromFormat ( "Ymd" , $input);
+        return (string) $date->format('Y-m-d');
+    }
+
+
     public function parse() {
 
         $portfolio = new StdClass;
@@ -52,7 +60,7 @@ class Google_Finance_OFX_Parser
             }
 
             if (strstr($line, "<DTTRADE>") !== false) {
-                $txn->date = substr($line, 9, -10);
+                $txn->date = $this->format_date(substr($line, 9, -10));
             }
             elseif (strstr($line, "<UNIQUEID>") !== false) {
                 $txn->ticker = (substr($line, 10));
@@ -88,7 +96,7 @@ class Google_Finance_OFX_Parser
             if ($line == "<INVBANKTRAN>") {
                 $cash = new StdClass;
             }elseif (strstr($line, "<DTPOSTED>") !== false) {
-                $cash->date = strtotime(substr($line, 10));
+                $cash->date = $this->format_date(substr($line, 10, -10));
             }elseif (strstr($line, "<TRNAMT>") !== false) {
                 $cash->total = (substr($line, 8));
             }elseif($line == "</INVBANKTRAN>") {
